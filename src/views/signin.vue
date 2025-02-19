@@ -6,13 +6,7 @@
       <h2 class="text-2xl font-semibold text-gray-700 text-center">
         Create an Account
       </h2>
-      <form @submit.prevent="handleSignup">
-        <input-component
-          v-model="formData.name"
-          label="Name"
-          placeholder="Type your Name"
-          type="text"
-        />
+      <form @submit.prevent="handleSignin">
         <input-component
           v-model="formData.email"
           label="Email"
@@ -29,13 +23,13 @@
           class="bg-blue-700 text-white px-4 py-2 rounded-md mt-6 w-full cursor-pointer hover:bg-gray-700"
           type="submit"
         >
-          Signup
+          Signin
         </button>
       </form>
       <p class="text-center mt-4">
-        Already have Account ?
-        <RouterLink to="/signin" class="text-blue-700 cursor-pointer underline"
-          >Signin</RouterLink
+        Don't have a account ?
+        <RouterLink to="/signup" class="text-blue-700 cursor-pointer underline"
+          >Create Account</RouterLink
         >
       </p>
     </div>
@@ -45,23 +39,22 @@
 <script>
 import InputComponent from "../components/Shared/InputComponent.vue";
 export default {
-  name: "Signup",
+  name: "Signin",
   components: {
     InputComponent,
   },
   data() {
     return {
       formData: {
-        name: "",
         email: "",
         password: "",
       },
     };
   },
   methods: {
-    async handleSignup() {
-      const res = await this.$store.dispatch("SIGNUP", this.formData);
-      //   console.log("Res from signup", res);
+    async handleSignin() {
+      const res = await this.$store.dispatch("SIGNIN", this.formData);
+      console.log("Res from Login", res);
       if (res.success) {
         this.$router.push("/");
       }
