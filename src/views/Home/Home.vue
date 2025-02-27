@@ -16,7 +16,7 @@
         intuitive tools help you create a standout resume that gets noticed.
         Start now and land your dream job!
       </p>
-      <RouterLink to="/">
+      <RouterLink to="/create-resume/personal-info">
         <button
           class="bg-blue-700 text-white px-4 py-2 rounded-md mt-6 hover:bg-gray-500 cursor-pointer"
         >

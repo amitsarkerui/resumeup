@@ -28,7 +28,7 @@ const actions = {
       user.set("email", formData.email);
       user.set("password", formData.password);
       const res = await user.signUp();
-      console.log("Res from store", res);
+      context.commit("setCurrentUser", res);
       return { success: true, data: res };
     } catch (error) {
       console.error(error);
