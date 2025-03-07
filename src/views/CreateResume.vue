@@ -29,9 +29,8 @@
             />
             <input-component
               @change="handleImageUpload"
-              v-model="resumeData.personal.imageFile"
               label="Profile Image"
-              placeholder="Add you images"
+              placeholder="Add your image"
               type="file"
             />
             <input-component
@@ -360,6 +359,7 @@
 <script>
 import InputComponent from "../components/Shared/InputComponent.vue";
 import userImagePlaceHolder from "/images/user-image-placeholder.jpeg";
+import Parse from "parse/dist/parse.min.js";
 
 export default {
   components: { InputComponent },
@@ -421,10 +421,9 @@ export default {
   },
   methods: {
     handleImageUpload(event) {
-      console.log("I am changed");
       const file = event.target.files[0];
       if (file) {
-        this.resumeData.imageFile = file;
+        this.resumeData.personal.imageFile = file;
         this.previewImages = URL.createObjectURL(file);
       }
     },
@@ -487,9 +486,38 @@ export default {
         this.slideCount += 1;
       }
     },
-    handleSubmit() {
-      console.log(this.resumeData);
+    async handleSubmit() {
+      try {
+        let imageFile = this.resumeData.personal.imageFile;
+
+        if (imageFile && !(imageFile instanceof Parse.File)) {
+          const file = new Parse.File(imageFile.name, imageFile);
+          await file.save();
+          this.resumeData.personal.imageFile = file._url;
+        }
+
+        const res = await this.$store.dispatch(
+          "CREATE_RESUME",
+          this.resumeData
+        );
+        console.log(res);
+
+        this.$router.push(`/resume/${res.id}`);
+      } catch (error) {
+        console.error("Error submitting resume:", error);
+      }
     },
+  },
+
+  mounted() {
+    const currentUser = this.$store.getters.getCurrentUser;
+    if (!currentUser) {
+      this.$router.push("/signin");
+    }
+  },
+  created() {
+    this.$store.dispatch("CHECK_USER_SESSION");
+    console.log("CU", this.currentUser);
   },
 };
 </script>

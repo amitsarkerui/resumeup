@@ -1,10 +1,11 @@
 import Parse from "parse/dist/parse.min.js";
+let Resume = Parse.Object.extend("Resume");
 const user = new Parse.User();
 const getUser = async () => {
   return Parse.User.current();
 };
 const state = () => ({
-  resume: [],
+  resume: {},
   currentUser: null,
 });
 const getters = {
@@ -12,11 +13,19 @@ const getters = {
     console.log("Current user in store and getters", state.currentUser);
     return state.currentUser;
   },
+  getResumeById: (state) => {
+    console.log(state.resume);
+    return state.resume;
+  },
 };
 const mutations = {
   setCurrentUser: (state, currentUser) => {
     console.log("Current User in Mutations", currentUser);
     state.currentUser = currentUser;
+  },
+  Set_Resume_By_Id: (state, resumeData) => {
+    console.log(resumeData);
+    state.resume = resumeData;
   },
 };
 const actions = {
@@ -62,6 +71,45 @@ const actions = {
       context.commit("setCurrentUser", null);
     } catch (error) {
       console.error("Logout failed", error);
+    }
+  },
+  async CREATE_RESUME(context, resumeData) {
+    try {
+      let resume = new Parse.Object("Resume");
+      const currentUser = await getUser();
+
+      const dataToSave = {
+        firstName: resumeData.personal.firstName,
+        lastName: resumeData.personal.lastName,
+        email: resumeData.personal.email,
+        userImage: resumeData.personal.imageFile,
+        address: resumeData.personal.address,
+        phone: resumeData.personal.phone,
+        objectives: resumeData.personal.objectives,
+        skills: resumeData.skills,
+        interests: resumeData.interests,
+        experience: resumeData.experience,
+        educations: resumeData.educations,
+        relatedUser: currentUser,
+      };
+
+      resume.set(dataToSave);
+      const res = await resume.save();
+      return res;
+    } catch (error) {
+      console.error("Error saving resume:", error);
+      throw error;
+    }
+  },
+  async FETCH_RESUME_BY_ID(context, id) {
+    try {
+      console.log(id);
+      const resumeQuery = new Parse.Query("Resume");
+      const res = await resumeQuery.get(id);
+      console.log("Get by Id", res);
+      await context.commit("Set_Resume_By_Id", res);
+    } catch (error) {
+      console.error(error);
     }
   },
 };
